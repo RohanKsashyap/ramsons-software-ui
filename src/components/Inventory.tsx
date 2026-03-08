@@ -335,129 +335,222 @@ export const Inventory: React.FC = () => {
 
   const renderLowStock = () => (
     <div className="space-y-4">
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-gap-2">
-        <AlertCircle className="text-yellow-600 mr-3 flex-shrink-0" size={20} />
+      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start gap-3">
+        <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={20} />
         <div>
-          <h3 className="font-semibold text-yellow-900">Low Stock Alert</h3>
-          <p className="text-sm text-yellow-800">These items are below their reorder level and need restocking.</p>
+          <h3 className="font-bold text-yellow-900 text-sm md:text-base">Low Stock Alert</h3>
+          <p className="text-xs md:text-sm text-yellow-800">These items are below their reorder level and need restocking.</p>
         </div>
       </div>
 
       {lowStockItems.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <AlertCircle className="mx-auto mb-4 text-gray-400" size={48} />
-          <p className="text-gray-600">No low stock items. All products are well stocked!</p>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <AlertCircle className="mx-auto mb-4 text-gray-300" size={48} />
+          <p className="text-gray-500 font-medium">No low stock items. All products are well stocked!</p>
         </div>
       ) : (
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product Name</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">SKU</th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Current Stock</th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Reorder Level</th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Units Needed</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
+        <>
+          {/* Desktop Table */}
+          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Product Name</th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">SKU</th>
+                  <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Current Stock</th>
+                  <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Reorder Level</th>
+                  <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Units Needed</th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {lowStockItems.map((item) => (
+                  <tr key={item.id || item._id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 text-sm font-bold text-gray-900">{item.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{item.sku || '-'}</td>
+                    <td className="px-6 py-4 text-right text-sm font-black text-red-600">
+                      {item.quantity ?? 0}
+                    </td>
+                    <td className="px-6 py-4 text-right text-sm text-gray-500">
+                      {item.reorderLevel ?? 5}
+                    </td>
+                    <td className="px-6 py-4 text-right text-sm font-black text-orange-600">
+                      {Math.max(0, (item.reorderLevel ?? 5) - (item.quantity ?? 0))}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      <button
+                        onClick={() => {
+                          setSelectedProduct(item);
+                          setShowAddModal(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 font-bold"
+                      >
+                        Restock
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
             {lowStockItems.map((item) => (
-              <tr key={item.id || item._id} className="hover:bg-gray-50">
-                <td className="px-6 py-3 text-sm text-gray-900">{item.name}</td>
-                <td className="px-6 py-3 text-sm text-gray-600">{item.sku || '-'}</td>
-                <td className="px-6 py-3 text-right text-sm font-semibold text-red-600">
-                  {item.quantity ?? 0}
-                </td>
-                <td className="px-6 py-3 text-right text-sm text-gray-600">
-                  {item.reorderLevel ?? 5}
-                </td>
-                <td className="px-6 py-3 text-right text-sm font-semibold text-orange-600">
-                  {Math.max(0, (item.reorderLevel ?? 5) - (item.quantity ?? 0))}
-                </td>
-                <td className="px-6 py-3 text-sm">
-                  <button
-                    onClick={() => {
-                      setSelectedProduct(item);
-                      setShowAddModal(true);
-                    }}
-                    className="text-green-600 hover:text-green-800 font-semibold text-xs"
-                  >
-                    Restock
-                  </button>
-                </td>
-              </tr>
+              <div key={item.id || item._id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-bold text-gray-900">{item.name}</h4>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest">{item.sku || 'No SKU'}</p>
+                  </div>
+                  <div className="bg-red-50 text-red-600 px-2 py-1 rounded-lg text-[10px] font-black uppercase">
+                    Low Stock
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2 bg-gray-50 p-3 rounded-lg mb-4">
+                  <div className="text-center">
+                    <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Current</p>
+                    <p className="text-sm font-black text-red-600">{item.quantity ?? 0}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Target</p>
+                    <p className="text-sm font-bold text-gray-700">{item.reorderLevel ?? 5}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Needed</p>
+                    <p className="text-sm font-black text-orange-600">{Math.max(0, (item.reorderLevel ?? 5) - (item.quantity ?? 0))}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedProduct(item);
+                    setShowAddModal(true);
+                  }}
+                  className="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-100 active:scale-95 transition-all"
+                >
+                  Restock Now
+                </button>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </>
       )}
     </div>
   );
 
   const renderAudit = () => (
     <div className="space-y-4">
-      <div className="flex gap-4">
-        <input
-          type="text"
-          placeholder="Search audit logs..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 px-4 py-2 border rounded-md"
-        />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <input
+            type="text"
+            placeholder="Search audit logs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all"
+          />
+        </div>
         <button
           onClick={fetchAuditLogs}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 text-sm font-bold transition-all active:scale-95"
         >
-          <RefreshCw size={18} /> Refresh
+          <RefreshCw size={16} /> Refresh
         </button>
       </div>
 
       {auditLogs.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <Notebook className="mx-auto mb-4 text-gray-400" size={48} />
-          <p className="text-gray-600">No audit logs yet. Inventory changes will appear here.</p>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <Notebook className="mx-auto mb-4 text-gray-300" size={48} />
+          <p className="text-gray-500 font-medium">No audit logs yet. Inventory changes will appear here.</p>
         </div>
       ) : (
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Type</th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Quantity Change</th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Previous</th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">New</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Reason</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
+        <>
+          {/* Desktop Table */}
+          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Product</th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Type</th>
+                  <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Change</th>
+                  <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Previous</th>
+                  <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">New</th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Reason</th>
+                  <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {auditLogs.map((log) => (
+                  <tr key={log._id} className="hover:bg-gray-50/50 transition-colors text-sm">
+                    <td className="px-6 py-4 font-bold text-gray-900">{log.productName}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
+                        log.type === 'add' ? 'bg-green-100 text-green-800' :
+                        log.type === 'sale' ? 'bg-red-100 text-red-800' :
+                        log.type === 'adjustment' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {log.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-black">
+                      {log.quantityChange > 0 ? `+${log.quantityChange}` : log.quantityChange}
+                    </td>
+                    <td className="px-6 py-4 text-right text-gray-500">{log.previousQuantity}</td>
+                    <td className="px-6 py-4 text-right font-bold text-gray-900">{log.newQuantity}</td>
+                    <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{log.reason}</td>
+                    <td className="px-6 py-4 text-gray-500 text-xs">
+                      {new Date(log.date).toLocaleDateString()} {new Date(log.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
             {auditLogs.map((log) => (
-              <tr key={log._id} className="hover:bg-gray-50">
-                <td className="px-6 py-3 text-sm text-gray-900">{log.productName}</td>
-                <td className="px-6 py-3 text-sm">
-                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
+              <div key={log._id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-bold text-gray-900">{log.productName}</h4>
+                    <p className="text-[10px] text-gray-400">{new Date(log.date).toLocaleString()}</p>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
                     log.type === 'add' ? 'bg-green-100 text-green-800' :
                     log.type === 'sale' ? 'bg-red-100 text-red-800' :
                     log.type === 'adjustment' ? 'bg-yellow-100 text-yellow-800' :
                     'bg-blue-100 text-blue-800'
                   }`}>
-                    {log.type.charAt(0).toUpperCase() + log.type.slice(1)}
+                    {log.type}
                   </span>
-                </td>
-                <td className="px-6 py-3 text-right text-sm font-semibold">{log.quantityChange}</td>
-                <td className="px-6 py-3 text-right text-sm text-gray-600">{log.previousQuantity}</td>
-                <td className="px-6 py-3 text-right text-sm text-gray-600">{log.newQuantity}</td>
-                <td className="px-6 py-3 text-sm text-gray-600">{log.reason}</td>
-                <td className="px-6 py-3 text-sm text-gray-600">
-                  {new Date(log.date).toLocaleDateString()} {new Date(log.date).toLocaleTimeString()}
-                </td>
-              </tr>
+                </div>
+                <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded-lg mb-2">
+                  <div className="text-center">
+                    <p className="text-[10px] text-gray-400 uppercase font-bold">Prev</p>
+                    <p className="text-xs font-medium text-gray-600">{log.previousQuantity}</p>
+                  </div>
+                  <div className="text-center border-x border-gray-200">
+                    <p className="text-[10px] text-gray-400 uppercase font-bold">Change</p>
+                    <p className={`text-xs font-black ${log.quantityChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {log.quantityChange > 0 ? `+${log.quantityChange}` : log.quantityChange}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-gray-400 uppercase font-bold">New</p>
+                    <p className="text-xs font-bold text-gray-900">{log.newQuantity}</p>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-600 bg-blue-50/50 p-2 rounded-lg">
+                  <span className="font-bold text-blue-800">Reason: </span>
+                  {log.reason}
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </>
       )}
     </div>
   );

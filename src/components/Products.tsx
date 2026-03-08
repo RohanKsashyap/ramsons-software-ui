@@ -140,29 +140,25 @@ export const Products: React.FC = () => {
   const categories = ['all', ...new Set(products.map(p => p.category).filter(Boolean))];
 
   return (
-    <div className="container mx-auto px-2 md:px-4 py-4 md:py-8">
+    <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
       {/* Search and filters */}
-      <div className="flex flex-col gap-3 mb-4 md:mb-6">
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 md:h-5 w-4 md:w-5 text-gray-400" />
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 mb-4 md:mb-6">
+        <div className="relative flex-1 sm:flex-auto">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 md:h-5 w-4 md:w-5" />
           <input
             type="text"
             placeholder="Search products..."
-            className="pl-10 pr-4 py-2 w-full text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="pl-10 pr-4 py-2 border rounded-lg w-full text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-4">
           <div className="relative flex-1 sm:flex-auto">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Filter className="h-3 md:h-4 w-3 md:w-4 text-gray-400" />
-            </div>
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 md:h-4 w-3 md:w-4" />
             <select
-              className="pl-10 pr-4 py-2 w-full text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="pl-10 pr-4 py-2 border rounded-lg appearance-none bg-white w-full text-sm"
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
             >
@@ -174,28 +170,30 @@ export const Products: React.FC = () => {
             </select>
           </div>
           
-          <button
-            onClick={() => setShowBundleForm(true)}
-            className="flex items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-xs md:text-sm whitespace-nowrap"
-          >
-            <Package className="h-3 md:h-4 w-3 md:w-4" />
-            <span className="hidden sm:inline">New Bundle</span>
-            <span className="sm:hidden">Bundle</span>
-          </button>
-          
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs md:text-sm whitespace-nowrap"
-          >
-            <Plus className="h-3 md:h-4 w-3 md:w-4" />
-            <span className="hidden sm:inline">New Product</span>
-            <span className="sm:hidden">New</span>
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowBundleForm(true)}
+              className="flex-1 flex items-center justify-center gap-2 bg-orange-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors text-sm whitespace-nowrap"
+            >
+              <Package className="h-4 w-4" />
+              <span className="hidden sm:inline">New Bundle</span>
+              <span className="sm:hidden">Bundle</span>
+            </button>
+            
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm whitespace-nowrap"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">New Product</span>
+              <span className="sm:hidden">New</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Bulk actions */}
-      <div className="bg-blue-50 p-3 md:p-4 rounded-md mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-blue-50 p-3 md:p-4 rounded-xl mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-blue-100">
         <div className="flex items-center">
           <input
             type="checkbox"
@@ -209,9 +207,9 @@ export const Products: React.FC = () => {
                 setSelectedProducts(filteredProducts.map(p => p.id as string));
               }
             }}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-2"
+            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer mr-3"
           />
-          <span className="text-blue-800 font-medium">
+          <span className="text-blue-900 font-bold text-sm">
             {selectedProducts.length > 0 
               ? `${selectedProducts.length} ${selectedProducts.length === 1 ? 'product' : 'products'} selected` 
               : 'Select All Products'}
@@ -221,12 +219,11 @@ export const Products: React.FC = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="flex items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-xs md:text-sm"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-bold shadow-lg shadow-red-100"
               disabled={deleting}
             >
-              <Trash2 className="h-3 md:h-4 w-3 md:w-4" />
-              <span className="hidden sm:inline">Delete Selected</span>
-              <span className="sm:hidden">Delete</span>
+              <Trash2 className="h-4 w-4" />
+              Delete Selected
             </button>
           </div>
         )}

@@ -128,52 +128,57 @@ export const Customers: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder="Search customers..."
-              className="pl-10 pr-4 py-2 border rounded-lg w-full sm:w-80"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
+        <div className="relative flex-1 sm:flex-auto">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 md:h-5 w-4 md:w-5" />
+          <input
+            type="text"
+            placeholder="Search customers..."
+            className="pl-10 pr-4 py-2 border rounded-lg w-full text-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-4">
+          <div className="relative flex-1 sm:flex-auto">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 md:h-4 w-3 md:w-4" />
+            <select
+              className="pl-10 pr-4 py-2 border rounded-lg appearance-none bg-white w-full text-sm"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="name">Sort by Name</option>
+              <option value="balance">Sort by Balance</option>
+              <option value="recent">Sort by Recent</option>
+            </select>
           </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <select
-                className="pl-10 pr-4 py-2 border rounded-lg appearance-none bg-white"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="name">Sort by Name</option>
-                <option value="balance">Sort by Balance</option>
-                <option value="recent">Sort by Recent</option>
-              </select>
-            </div>
 
+          <div className="flex gap-2">
             {selectedCustomers.length > 0 && (
               <button 
                 onClick={() => setShowDeleteConfirm(true)}
-                className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 bg-red-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm"
                 disabled={deleting}
               >
                 <Trash2 className="h-4 w-4" />
-                Delete ({selectedCustomers.length})
+                <span className="hidden sm:inline">Delete ({selectedCustomers.length})</span>
+                <span className="sm:hidden">({selectedCustomers.length})</span>
               </button>
             )}
             
             <button 
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+              className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm whitespace-nowrap"
+            >
               <Plus className="h-4 w-4" />
-              New Customer
+              <span className="hidden sm:inline">New Customer</span>
+              <span className="sm:hidden">New</span>
             </button>
           </div>
         </div>
+      </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedCustomers.length > 0 ? (
