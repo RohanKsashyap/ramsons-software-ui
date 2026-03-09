@@ -14,7 +14,7 @@ interface Customer {
   advancePayment?: number;
 }
 
-const API_BASE_URL = 'https://ramsons-software-backend.onrender.com/api/vi';
+const API_BASE_URL = 'https://ramsons-software-backend.onrender.com/api/v1';
 
 class ApiService {
   private token: string | null = null;
