@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, Plus, Edit, RefreshCw, BarChart3, Notebook, Download, Filter,Package } from 'lucide-react';
+import { AlertCircle, Plus, Edit,Search, RefreshCw, BarChart3, Notebook, Download, Filter,Package } from 'lucide-react';
 import type { Product } from '../types';
 import { apiService } from '../services/api';
 
