@@ -96,13 +96,21 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
       case 'top-left':
         return 'top-4 left-4';
       case 'bottom-right':
-        return 'bottom-4 right-4';
+        return 'bottom-4 right-4 flex flex-col-reverse items-end';
       case 'bottom-left':
-        return 'bottom-4 left-4';
+        return 'bottom-4 left-4 flex flex-col-reverse items-start';
       case 'top-right':
       default:
-        return 'top-4 right-4';
+        return 'top-4 right-4 flex flex-col items-end';
     }
+  };
+
+  const getDropdownClasses = () => {
+    const baseClasses = "absolute w-80 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-hidden";
+    if (position.startsWith('bottom')) {
+      return `${baseClasses} bottom-full mb-4 ${position.endsWith('right') ? 'right-0' : 'left-0'}`;
+    }
+    return `${baseClasses} top-full mt-4 ${position.endsWith('right') ? 'right-0' : 'left-0'}`;
   };
 
   // Unread badge: persist until X is clicked (i.e., item removed)
@@ -111,7 +119,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
   return (
     <div className={`fixed ${getPositionClasses()} z-50`} ref={containerRef}>
       {/* Notification Bell */}
-      <div className="relative">
+      <div className="relative order-last">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="relative p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200"
@@ -127,7 +135,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
 
         {/* Notification Dropdown */}
         {isExpanded && (
-          <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-hidden">
+          <div className={getDropdownClasses()}>
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -223,7 +231,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
       </div>
 
       {/* Toast Notifications (auto-close only hides the toast; list persists) */}
-      <div className="space-y-2">
+      <div className={`space-y-2 ${position.startsWith('bottom') ? 'mb-4' : 'mt-4'}`}>
         {notifications.filter(n => n.showInToast).slice(0, 3).map((notification) => (
           <NotificationToast
             key={notification.id}

@@ -184,50 +184,66 @@ export const BundleForm: React.FC<BundleFormProps> = ({ onClose, onSave }) => {
               ) : (
                 bundleItems.map((item, idx) => (
                   <div key={idx} className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-all flex items-center gap-4 group">
-                    <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 font-bold overflow-hidden">
+                    <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 font-bold overflow-hidden flex-shrink-0">
                       {item.product ? (
                         <Package className="h-6 w-6" />
                       ) : (
                         "M"
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <input
-                        type="text"
-                        value={item.name}
-                        onChange={(e) => updateItem(idx, { name: e.target.value })}
-                        className="text-sm font-bold text-gray-900 bg-transparent focus:outline-none w-full border-b border-transparent focus:border-blue-100"
-                        placeholder="Item Name"
-                      />
-                      <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mt-0.5">
-                        Price: ₹{item.price.toFixed(2)}
-                      </p>
+                    <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Item Name</label>
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => updateItem(idx, { name: e.target.value })}
+                          className="text-sm font-bold text-gray-900 bg-transparent focus:outline-none w-full border-b border-gray-200 focus:border-blue-500"
+                          placeholder="Item Name"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Price (₹)</label>
+                        <input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) => updateItem(idx, { price: parseFloat(e.target.value) || 0 })}
+                          className="text-sm font-bold text-blue-600 bg-transparent focus:outline-none w-full border-b border-gray-200 focus:border-blue-500"
+                          placeholder="0.00"
+                        />
+                      </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center bg-gray-50 rounded-xl px-2 py-1">
+                      <div className="flex flex-col items-center">
+                        <label className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Qty</label>
+                        <div className="flex items-center bg-gray-50 rounded-xl px-2 py-1">
+                          <button 
+                            type="button"
+                            onClick={() => updateItem(idx, { quantity: Math.max(1, item.quantity - 1) })}
+                            className="p-1 hover:text-blue-600 transition-colors"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="w-8 text-center text-xs font-black text-gray-900">{item.quantity}</span>
+                          <button 
+                            type="button"
+                            onClick={() => updateItem(idx, { quantity: item.quantity + 1 })}
+                            className="p-1 hover:text-blue-600 transition-colors"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <label className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Actions</label>
                         <button 
                           type="button"
-                          onClick={() => updateItem(idx, { quantity: Math.max(1, item.quantity - 1) })}
-                          className="p-1 hover:text-blue-600 transition-colors"
+                          onClick={() => removeItem(idx)}
+                          className="p-2 text-gray-300 hover:text-red-500 transition-colors"
                         >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-8 text-center text-xs font-black text-gray-900">{item.quantity}</span>
-                        <button 
-                          type="button"
-                          onClick={() => updateItem(idx, { quantity: item.quantity + 1 })}
-                          className="p-1 hover:text-blue-600 transition-colors"
-                        >
-                          <Plus className="h-3 w-3" />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
-                      <button 
-                        type="button"
-                        onClick={() => removeItem(idx)}
-                        className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
                     </div>
                   </div>
                 ))

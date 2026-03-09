@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Plus, Check } from 'lucide-react';
 import { apiService } from '../services/api';
 import type { Product } from '../types';
@@ -21,11 +21,24 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [showDropdown, setShowDropdown] = useState(inline);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Fetch products on component mount
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Handle click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        if (!inline) setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [inline]);
 
   const fetchProducts = async () => {
     try {
@@ -102,7 +115,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
     : "absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto";
 
   return (
-    <div className={`relative flex flex-col ${inline ? 'h-full' : ''} ${className}`}>
+    <div ref={containerRef} className={`relative flex flex-col ${inline ? 'h-full' : ''} ${className}`}>
       {/* Search Input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -196,9 +209,9 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                     </button>
                   ))
                 ) : (
-                  <div className="px-4 py-12 text-center text-gray-500">
-                    <p className="font-medium">No products found</p>
-                    <p className="text-sm">Try searching with a different term</p>
+                  <div className="px-4 py-6 text-center text-gray-500">
+                    <p className="font-medium text-sm">No products found</p>
+                    <p className="text-xs">Try searching with a different term</p>
                   </div>
                 )}
                 

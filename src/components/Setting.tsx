@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, User, Loader, Edit2 } from 'lucide-react';
+import { Bell, User, Loader, Edit2,Plus } from 'lucide-react';
 import { NotificationSettings } from './NotificationSettings';
 import { CompanyProfileModal } from './CompanyProfileModal';
 import { apiService } from '../services/api';

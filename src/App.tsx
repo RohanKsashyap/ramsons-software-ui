@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LogIn, LogOut, Menu, X } from 'lucide-react';
+import { Link } from 'lucide-react';
 import { AuthModal } from './components/AuthModal';
 import { useAuth } from './hooks/useAuth';
 import { apiService } from './services/api';
@@ -28,6 +29,12 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { user, logout } = useAuth();
+
+  const handleGoHome = () => {
+    setActiveTab('dashboard');
+    window.location.hash = '#/dashboard';
+    setSidebarOpen(false);
+  };
 
   useEffect(() => {
     const fetchCompanyName = async () => {
@@ -94,14 +101,20 @@ function App() {
   return (
     <div className="flex h-screen bg-gray-100 flex-col md:flex-row">
       {/* Mobile Header */}
-      <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between z-40">
-        <h1 className="text-lg font-bold text-gray-800 truncate">{companyName}</h1>
+      <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center gap-2 z-40">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-md hover:bg-gray-100"
+          className="p-2 rounded-md hover:bg-gray-100 mr-2"
+          aria-label="Toggle menu"
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
+        <h1 
+          onClick={handleGoHome}
+          className="text-lg font-bold text-gray-800 truncate cursor-pointer flex-1"
+        >
+          {companyName}
+        </h1>
       </div>
 
       {/* Mobile Backdrop Overlay */}
@@ -118,7 +131,12 @@ function App() {
       } md:translate-x-0 z-40 md:z-auto md:max-h-full max-h-screen`}>
         <div className="p-4 border-b hidden md:block">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-800">{companyName}</h1>
+           <h1 
+             onClick={handleGoHome}
+             className="text-xl font-bold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+           >
+             {companyName}
+           </h1> 
             {user ? (
               <button
                 onClick={logout}
@@ -325,7 +343,7 @@ function App() {
       </div>
 
       {/* Notification Manager */}
-      <NotificationManager maxNotifications={5} position="top-right" />
+      <NotificationManager maxNotifications={5} position="bottom-right" />
 
       <AuthModal
         isOpen={isAuthModalOpen}
