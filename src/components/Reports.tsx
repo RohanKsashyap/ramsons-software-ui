@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, PieChart, Calendar, Download, RefreshCw, Loader2 } from 'lucide-react';
+import { BarChart, PieChart, Calendar, Download, RefreshCw, Loader2, MessageCircle } from 'lucide-react';
 import api from '../services/api';
 
 import { exportToExcel, exportToPDF } from '../utils/exportUtils';
@@ -124,46 +124,50 @@ export const Reports: React.FC = () => {
     }
   };
 
+  const fetchCustomerReportData = async (customer: any) => {
+    const [response, productsResponse] = await Promise.all([
+      api.transactions.getByCustomer(customer._id),
+      api.products.getAll()
+    ]);
+    
+    // Ensure we have an array of transactions, handling different API response structures
+    const transactions = Array.isArray(response) ? response : (response as any).data || (response as any).transactions || [];
+    const products = Array.isArray(productsResponse) ? productsResponse : (productsResponse as any).data || [];
+    
+    const productMap: Record<string, any> = {};
+    products.forEach((p: any) => {
+      if (p._id) productMap[p._id] = p;
+      if (p.id) productMap[p.id] = p;
+    });
+
+    // Enrich transactions with product info if missing
+    const enrichedTransactions = transactions.map((t: any) => ({
+      ...t,
+      items: t.items?.map((item: any) => {
+        if (!item.product && typeof item.productId === 'string') {
+          return { ...item, product: productMap[item.productId] };
+        }
+        return item;
+      })
+    }));
+
+    return {
+      summary: {
+        name: customer.name,
+        phone: customer.phone,
+        totalCredit: customer.totalCredit,
+        totalPaid: customer.totalPaid,
+        balance: customer.balance,
+        advancePayment: customer.advancePayment || 0
+      },
+      transactions: enrichedTransactions
+    };
+  };
+
   const handleCustomerExport = async (customer: any) => {
     setExporting(true);
     try {
-      const [response, productsResponse] = await Promise.all([
-        api.transactions.getByCustomer(customer._id),
-        api.products.getAll()
-      ]);
-      
-      // Ensure we have an array of transactions, handling different API response structures
-      const transactions = Array.isArray(response) ? response : (response as any).data || (response as any).transactions || [];
-      const products = Array.isArray(productsResponse) ? productsResponse : (productsResponse as any).data || [];
-      
-      const productMap: Record<string, any> = {};
-      products.forEach((p: any) => {
-        if (p._id) productMap[p._id] = p;
-        if (p.id) productMap[p.id] = p;
-      });
-
-      // Enrich transactions with product info if missing
-      const enrichedTransactions = transactions.map((t: any) => ({
-        ...t,
-        items: t.items?.map((item: any) => {
-          if (!item.product && typeof item.productId === 'string') {
-            return { ...item, product: productMap[item.productId] };
-          }
-          return item;
-        })
-      }));
-
-      const customerData = {
-        summary: {
-          name: customer.name,
-          phone: customer.phone,
-          totalCredit: customer.totalCredit,
-          totalPaid: customer.totalPaid,
-          balance: customer.balance,
-          advancePayment: customer.advancePayment || 0
-        },
-        transactions: enrichedTransactions
-      };
+      const customerData = await fetchCustomerReportData(customer);
       
       const filename = `customer_report_${customer.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`;
       // For individual reports, we'll default to PDF as it's more common for customer statements
@@ -171,6 +175,64 @@ export const Reports: React.FC = () => {
     } catch (error) {
       console.error('Customer export error:', error);
       alert('Failed to export customer report.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleCustomerWhatsAppShare = async (customer: any) => {
+    if (!customer.phone) {
+      alert('No phone number available for this customer.');
+      return;
+    }
+
+    setExporting(true);
+    try {
+      const data = await fetchCustomerReportData(customer);
+      const { summary, transactions } = data;
+      
+      // Clean phone number (remove spaces, symbols)
+      const phoneNumber = customer.phone.replace(/\D/g, '');
+      
+      // Check if it's already a full number (with country code) or needs 91 prefix (India)
+      // Most Indian numbers are 10 digits
+      const formattedPhone = phoneNumber.length === 10 ? `91${phoneNumber}` : phoneNumber;
+      
+      // Format the individual report as a text message
+      let reportText = `*Ramsons Accounting - Account Statement*\n\n`;
+      reportText += `*Customer:* ${summary.name}\n`;
+      reportText += `*Date:* ${new Date().toLocaleDateString()}\n\n`;
+      
+      reportText += `*--- Summary ---*\n`;
+      reportText += `Total Credit: ₹${(summary.totalCredit || 0).toLocaleString()}\n`;
+      reportText += `Total Paid: ₹${(summary.totalPaid || 0).toLocaleString()}\n`;
+      if (summary.advancePayment > 0) {
+        reportText += `Advance Balance: ₹${summary.advancePayment.toLocaleString()}\n`;
+      }
+      reportText += `*Outstanding Balance: ₹${(summary.balance || 0).toLocaleString()}*\n\n`;
+      
+      if (transactions && transactions.length > 0) {
+        reportText += `*--- Recent Transactions ---*\n`;
+        // Show last 5 transactions to keep message length reasonable
+        const recentTransactions = transactions.slice(0, 5);
+        recentTransactions.forEach((t: any) => {
+          const date = new Date(t.createdAt).toLocaleDateString();
+          reportText += `- ${date}: ${t.type} (₹${(t.amount || 0).toLocaleString()}) - ${t.status}\n`;
+        });
+        if (transactions.length > 5) {
+          reportText += `... and ${transactions.length - 5} more transactions.\n`;
+        }
+      }
+      
+      reportText += `\nThank you for your business!`;
+      
+      const message = encodeURIComponent(reportText);
+      
+      // Open WhatsApp Web or Desktop App
+      window.open(`https://wa.me/${formattedPhone}?text=${message}`, '_blank');
+    } catch (error) {
+      console.error('WhatsApp share error:', error);
+      alert('Failed to generate report for WhatsApp.');
     } finally {
       setExporting(false);
     }
@@ -395,14 +457,24 @@ export const Reports: React.FC = () => {
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{(customer.totalPaid || 0).toLocaleString()}</td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">₹{(customer.balance || 0).toLocaleString()}</td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button
-                                  onClick={() => handleCustomerExport(customer)}
-                                  className="text-blue-600 hover:text-blue-900 flex items-center justify-end gap-1 ml-auto"
-                                  title="Export individual report"
-                                >
-                                  <Download className="h-4 w-4" />
-                                  <span>Export</span>
-                                </button>
+                                <div className="flex items-center justify-end gap-3">
+                                  <button
+                                    onClick={() => handleCustomerWhatsAppShare(customer)}
+                                    className="text-green-600 hover:text-green-900 flex items-center gap-1"
+                                    title="Share on WhatsApp"
+                                  >
+                                    <MessageCircle className="h-4 w-4" />
+                                    <span>Share</span>
+                                  </button>
+                                  <button
+                                    onClick={() => handleCustomerExport(customer)}
+                                    className="text-blue-600 hover:text-blue-900 flex items-center gap-1"
+                                    title="Export PDF"
+                                  >
+                                    <Download className="h-4 w-4" />
+                                    <span>PDF</span>
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))
@@ -445,12 +517,22 @@ export const Reports: React.FC = () => {
                               <h5 className="font-bold text-gray-900">{customer.name}</h5>
                               <p className="text-xs text-gray-500">{customer.phone}</p>
                             </div>
-                            <button
-                              onClick={() => handleCustomerExport(customer)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            >
-                              <Download className="h-4 w-4" />
-                            </button>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleCustomerWhatsAppShare(customer)}
+                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                title="Share on WhatsApp"
+                              >
+                                <MessageCircle className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleCustomerExport(customer)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Export PDF"
+                              >
+                                <Download className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
                           <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-50">
                             <div>
