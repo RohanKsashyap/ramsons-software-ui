@@ -46,18 +46,31 @@ export const exportToExcel = async (reportType: string, data: ReportData, filena
       columns.push({ header: 'Remaining', key: 'remainingAmount', width: 15 });
     }
 
-    rows = data.transactions.map((t: any) => ({
-      date: new Date(t.createdAt).toLocaleDateString(),
-      customer: t.customer?.name || t.customerName,
-      amount: t.amount || 0,
-      status: t.status,
-      type: t.type,
-      paidAmount: t.paidAmount || 0,
-      remainingAmount: t.remainingAmount || 0,
-      details: t.paymentMethod === 'advance' && t.advanceOriginalAmount 
-        ? `Paid from exact advance amount: ₹${t.advanceOriginalAmount.toFixed(2)} (Used: ₹${t.amount.toFixed(2)})`
-        : t.description || '',
-    }));
+    rows = data.transactions.map((t: any) => {
+      let details = t.description || '';
+      
+      if (t.items && t.items.length > 0) {
+        const itemDetails = t.items.map((item: any) => {
+          const product = item.product || item.productId;
+          const productName = typeof product === 'object' ? product.name : 'Product';
+          return `${productName} (${item.quantity} x ₹${item.pricePerUnit || 0})`;
+        }).join(', ');
+        details = itemDetails + (t.description ? ` - ${t.description}` : '');
+      } else if (t.paymentMethod === 'advance' && t.advanceOriginalAmount) {
+        details = `Paid from exact advance amount: ₹${t.advanceOriginalAmount.toFixed(2)} (Used: ₹${t.amount.toFixed(2)})`;
+      }
+
+      return {
+        date: new Date(t.createdAt).toLocaleDateString(),
+        customer: t.customer?.name || t.customerName,
+        amount: t.amount || 0,
+        status: t.status,
+        type: t.type,
+        paidAmount: t.paidAmount || 0,
+        remainingAmount: t.remainingAmount || 0,
+        details: details,
+      };
+    });
   }
 
   worksheet.columns = columns as ExcelJS.Column[];
@@ -187,6 +200,7 @@ export const exportToPDF = async (reportType: string, data: ReportData, filename
             <tr>
               <th>Date</th>
               <th>Type</th>
+              <th>Details</th>
               <th>Amount</th>
               <th>Paid</th>
               <th>Remaining</th>
@@ -198,6 +212,23 @@ export const exportToPDF = async (reportType: string, data: ReportData, filename
               <tr>
                 <td>${new Date(t.createdAt).toLocaleDateString()}</td>
                 <td>${t.type}</td>
+                <td>
+                  <div style="font-size: 11px; max-width: 250px;">
+                    ${t.items && t.items.length > 0 
+                      ? `
+                        <div style="margin-bottom: 4px;">
+                          ${t.items.map((item: any) => {
+                            const product = item.product || item.productId;
+                            const productName = typeof product === 'object' ? product.name : 'Product';
+                            return `<div style="margin-bottom: 2px;">• ${productName} <span style="color: #64748b;">(${item.quantity} x ₹${(item.pricePerUnit || 0).toLocaleString()})</span></div>`;
+                          }).join('')}
+                        </div>
+                        ${t.description ? `<div style="font-size: 10px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 2px; margin-top: 2px;">${t.description}</div>` : ''}
+                      `
+                      : `<span style="color: #64748b; font-style: italic;">${t.description || 'No description'}</span>`
+                    }
+                  </div>
+                </td>
                 <td class="amount">₹${(t.amount || 0).toLocaleString()}</td>
                 <td class="amount">₹${(t.paidAmount || 0).toLocaleString()}</td>
                 <td class="amount">₹${(t.remainingAmount || 0).toLocaleString()}</td>

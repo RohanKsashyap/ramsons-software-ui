@@ -26,6 +26,11 @@ const Product = sequelize.define('Product', {
       min: 0,
     },
   },
+  unit: {
+    type: DataTypes.STRING,
+    defaultValue: 'pcs',
+    allowNull: true,
+  },
   sku: {
     type: DataTypes.STRING,
     allowNull: true,

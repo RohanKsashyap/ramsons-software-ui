@@ -80,6 +80,7 @@ export interface Product {
   name: string;
   description?: string;
   price: number;
+  unit?: string;
   sku?: string;
   category?: string;
   layout?: string;

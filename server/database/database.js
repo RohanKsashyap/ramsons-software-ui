@@ -16,7 +16,7 @@ async function initializeDatabase() {
     console.log('Database connection established successfully.');
     
     // Import and sync models
-    const { Customer, Transaction, NotificationRule, FollowUpSequence } = require('./models');
+    const { Customer, Transaction, NotificationRule, FollowUpSequence, Product } = require('./models');
     await sequelize.sync({ alter: true });
     
     console.log('Database models synchronized successfully.');

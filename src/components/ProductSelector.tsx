@@ -101,6 +101,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
     const newProduct: Product = {
       name: searchTerm.trim(),
       price: 0,
+      unit: 'pcs',
       inStock: true,
       description: ''
     };
@@ -200,7 +201,7 @@ export const ProductSelector: React.FC<ProductSelectorProps> = ({
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-blue-600 font-bold text-sm">₹{product.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                          <div className="text-blue-600 font-bold text-sm">₹{product.price.toLocaleString(undefined, { minimumFractionDigits: 2 })} / {product.unit || 'pcs'}</div>
                           {product.quantity !== undefined && (
                             <div className="text-[10px] text-gray-400">Qty: {product.quantity}</div>
                           )}

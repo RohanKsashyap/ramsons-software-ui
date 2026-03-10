@@ -127,10 +127,32 @@ export const Reports: React.FC = () => {
   const handleCustomerExport = async (customer: any) => {
     setExporting(true);
     try {
-      const response = await api.transactions.getByCustomer(customer._id);
+      const [response, productsResponse] = await Promise.all([
+        api.transactions.getByCustomer(customer._id),
+        api.products.getAll()
+      ]);
+      
       // Ensure we have an array of transactions, handling different API response structures
       const transactions = Array.isArray(response) ? response : (response as any).data || (response as any).transactions || [];
+      const products = Array.isArray(productsResponse) ? productsResponse : (productsResponse as any).data || [];
       
+      const productMap: Record<string, any> = {};
+      products.forEach((p: any) => {
+        if (p._id) productMap[p._id] = p;
+        if (p.id) productMap[p.id] = p;
+      });
+
+      // Enrich transactions with product info if missing
+      const enrichedTransactions = transactions.map((t: any) => ({
+        ...t,
+        items: t.items?.map((item: any) => {
+          if (!item.product && typeof item.productId === 'string') {
+            return { ...item, product: productMap[item.productId] };
+          }
+          return item;
+        })
+      }));
+
       const customerData = {
         summary: {
           name: customer.name,
@@ -140,7 +162,7 @@ export const Reports: React.FC = () => {
           balance: customer.balance,
           advancePayment: customer.advancePayment || 0
         },
-        transactions
+        transactions: enrichedTransactions
       };
       
       const filename = `customer_report_${customer.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`;

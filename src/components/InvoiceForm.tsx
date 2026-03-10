@@ -159,6 +159,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onClose, onSa
                 price: item.pricePerUnit,
                 description: item.product?.description || '',
                 layout: item.product?.layout || '',
+                unit: item.product?.unit || 'pcs',
                 inStock: true,
                 quantity: totalQtyForThisProduct // Set initial quantity to match total invoice quantity
               });
@@ -556,16 +557,38 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onClose, onSa
                                 />
                               </td>
                               <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
-                                <input
-                                  type="number"
-                                  min="1"
-                                  value={editingItem?.quantity || 1}
-                                  onChange={(e) => setEditingItem({
-                                    ...editingItem!,
-                                    quantity: parseInt(e.target.value) || 1
-                                  })}
-                                  className="w-16 px-2 py-1 border border-gray-300 rounded-md text-right"
-                                />
+                                <div className="space-y-1">
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={editingItem?.quantity || 1}
+                                    onChange={(e) => setEditingItem({
+                                      ...editingItem!,
+                                      quantity: parseInt(e.target.value) || 1
+                                    })}
+                                    className="w-full px-2 py-1 border border-gray-300 rounded-md text-right"
+                                  />
+                                  <select
+                                    value={editingItem?.product?.unit || (typeof editingItem?.productId === 'object' ? (editingItem!.productId as any).unit : '') || 'pcs'}
+                                    onChange={(e) => setEditingItem({
+                                      ...editingItem!,
+                                      product: {
+                                        ...(editingItem!.product || (typeof editingItem?.productId === 'object' ? (editingItem!.productId as any) : { name: '', price: 0, inStock: true })),
+                                        unit: e.target.value
+                                      }
+                                    })}
+                                    className="w-full px-1 py-1 border border-gray-300 rounded-md text-[10px]"
+                                  >
+                                    <option value="pcs">pcs</option>
+                                    <option value="kg">kg</option>
+                                    <option value="g">g</option>
+                                    <option value="mtr">mtr</option>
+                                    <option value="ltr">ltr</option>
+                                    <option value="box">box</option>
+                                    <option value="pkt">pkt</option>
+                                    <option value="set">set</option>
+                                  </select>
+                                </div>
                               </td>
                               <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-right">
                                 ₹{((editingItem?.pricePerUnit || 0) * (editingItem?.quantity || 1)).toFixed(2)}
@@ -623,7 +646,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onClose, onSa
                                     -
                                   </button>
                                   <span className="px-3 py-0.5 border-t border-b border-gray-300 bg-white">
-                                    {item.quantity}
+                                    {item.quantity} {item.product?.unit || (typeof item.productId === 'object' ? (item.productId as any).unit : '') || 'pcs'}
                                   </span>
                                   <button 
                                     type="button"

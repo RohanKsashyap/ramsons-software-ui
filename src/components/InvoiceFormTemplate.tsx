@@ -261,6 +261,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                 price: item.pricePerUnit,
                 description: item.product?.description || '',
                 layout: item.product?.layout || '',
+                unit: item.product?.unit || 'pcs',
                 inStock: true,
                 quantity: totalQtyForThisProduct
               });
@@ -672,12 +673,17 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                             </div>
                           </td>
                           <td className="py-6">
-                            <input
-                              type="number"
-                              value={item.quantity === 0 ? '' : item.quantity}
-                              onChange={(e) => handleQuantityChange(idx, parseInt(e.target.value) || 0)}
-                              className="w-full text-center text-sm font-bold text-gray-900 bg-gray-50 rounded-xl py-2 focus:outline-none"
-                            />
+                            <div className="flex flex-col items-center gap-1">
+                              <input
+                                type="number"
+                                value={item.quantity === 0 ? '' : item.quantity}
+                                onChange={(e) => handleQuantityChange(idx, parseInt(e.target.value) || 0)}
+                                className="w-full text-center text-sm font-bold text-gray-900 bg-gray-50 rounded-xl py-2 focus:outline-none"
+                              />
+                              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                {item.product?.unit || (typeof item.productId === 'object' ? (item.productId as any).unit : '') || 'pcs'}
+                              </span>
+                            </div>
                           </td>
                           <td className="py-6">
                             <div className="flex items-center justify-end gap-1 text-sm font-bold text-black">

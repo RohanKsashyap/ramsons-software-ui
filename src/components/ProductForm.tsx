@@ -14,6 +14,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSa
     name: '',
     description: '',
     price: '',
+    unit: 'pcs',
     sku: '',
     category: '',
     layout: '',
@@ -28,6 +29,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSa
         name: product.name,
         description: product.description || '',
         price: product.price.toString(),
+        unit: product.unit || 'pcs',
         sku: product.sku || '',
         category: product.category || '',
         layout: product.layout || '',
@@ -87,6 +89,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSa
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         price: parseFloat(formData.price),
+        unit: formData.unit,
         sku: formData.sku.trim() || undefined,
         category: formData.category.trim() || undefined,
         layout: formData.layout.trim() || undefined,
@@ -189,6 +192,28 @@ export const ProductForm: React.FC<ProductFormProps> = ({ product, onClose, onSa
                 placeholder="0.00"
               />
               {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price}</p>}
+            </div>
+            
+            <div>
+              <label htmlFor="unit" className="block text-sm font-medium text-gray-700 mb-1">
+                Unit
+              </label>
+              <select
+                id="unit"
+                name="unit"
+                value={formData.unit}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option value="pcs">Pieces (pcs)</option>
+                <option value="kg">Kilogram (kg)</option>
+                <option value="g">Gram (g)</option>
+                <option value="mtr">Meter (mtr)</option>
+                <option value="ltr">Liter (ltr)</option>
+                <option value="box">Box</option>
+                <option value="pkt">Packet (pkt)</option>
+                <option value="set">Set</option>
+              </select>
             </div>
             
             <div>

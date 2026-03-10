@@ -32,6 +32,7 @@ export const Products: React.FC = () => {
       name: rawProduct.name,
       description: rawProduct.description,
       price: typeof rawProduct.price === 'number' ? rawProduct.price : parseFloat(rawProduct.price || '0'),
+      unit: rawProduct.unit || 'pcs',
       sku: rawProduct.sku,
       category: rawProduct.category,
       layout: rawProduct.layout,
@@ -290,7 +291,7 @@ export const Products: React.FC = () => {
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center justify-between text-gray-600">
                     <span>Price:</span>
-                    <span className="font-medium">₹{product.price.toFixed(2)}</span>
+                    <span className="font-medium">₹{product.price.toFixed(2)} / {product.unit || 'pcs'}</span>
                   </div>
                   
                   {product.sku && (

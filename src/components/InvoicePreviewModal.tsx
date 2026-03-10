@@ -295,7 +295,7 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
                           {item.product?.name || (typeof item.productId === 'object' ? item.productId.name : 'Product')}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-sm text-right text-gray-700">
-                          {item.quantity}
+                          {item.quantity} {item.product?.unit || (typeof item.productId === 'object' ? (item.productId as any).unit : '') || 'pcs'}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-sm text-right text-gray-700">
                           ₹{item.pricePerUnit.toFixed(2)}
