@@ -450,14 +450,14 @@ export const CustomerOrdersModal: React.FC<CustomerOrdersModalProps> = ({
         <div className="p-6 border-t border-gray-100 bg-white flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400 font-medium">Showing <span className="font-bold text-gray-900">{filteredTransactions.length}</span> transactions</p>
           <div className="flex items-center gap-8">
-            <button className="text-sm font-bold text-gray-700 hover:text-orange-600 transition-colors flex items-center gap-2">
+            {/* <button className="text-sm font-bold text-gray-700 hover:text-orange-600 transition-colors flex items-center gap-2">
               <Download className="h-4.5 w-4.5" />
               Export CSV
             </button>
             <button className="flex items-center gap-2 px-8 py-3 bg-orange-600 text-white rounded-xl text-sm font-bold hover:bg-orange-700 transition-all shadow-lg shadow-orange-200">
               <Printer className="h-4.5 w-4.5" />
               Print Statement
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
