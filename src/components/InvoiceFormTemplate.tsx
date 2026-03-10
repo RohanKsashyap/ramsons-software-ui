@@ -479,9 +479,9 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                       )}
                     </div>
                     <div>
-                      <h2 className="text-lg md:text-xl font-bold text-gray-900">{companyDetails.name || 'Skyline Digital Agency'}</h2>
-                      <p className="text-xs md:text-sm text-gray-500 max-w-xs">{companyDetails.address || '123 Tech Plaza, Silicon Valley, CA'}</p>
-                      <p className="text-xs md:text-sm text-gray-500">{companyDetails.email || 'billing@skylinedigital.com'}</p>
+                      <h2 className="text-lg md:text-xl font-bold text-gray-900">{companyDetails.name || 'Company Name'}</h2>
+                      <p className="text-xs md:text-sm text-gray-500 max-w-xs">{companyDetails.address || 'Address'}</p>
+                      <p className="text-xs md:text-sm text-gray-500">{companyDetails.email || 'Email'}</p>
                     </div>
                   </div>
                   <div className="text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-6 md:pt-0">
