@@ -388,7 +388,7 @@ export const CustomerOrdersModal: React.FC<CustomerOrdersModalProps> = ({
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-gray-900 text-base leading-none">
-                          {t.type === 'refund' ? `-₹${t.amount.toLocaleString()}` : `₹${t.amount.toLocaleString()}`}
+                          {t.type === 'refund' ? `-₹${t.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : `₹${t.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
                         </p>
                         <p className="text-[10px] text-gray-400 font-medium mt-1">{formatDate(t.date)}</p>
                       </div>
@@ -430,9 +430,14 @@ export const CustomerOrdersModal: React.FC<CustomerOrdersModalProps> = ({
                                   <div className="min-w-0">
                                     <p className="text-xs font-bold text-gray-900 truncate">{productName}</p>
                                     <p className="text-[9px] text-gray-400 font-bold uppercase">Qty: {item.quantity}</p>
+                                    {product?.description && (
+                                      <p className="text-[8px] text-gray-500 italic leading-tight mt-0.5 line-clamp-1">
+                                        {product.description}
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
-                                <p className="text-xs font-bold text-gray-900">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                <p className="text-xs font-bold text-gray-900">₹{(item.total || (item.pricePerUnit * item.quantity)).toLocaleString('en-IN')}</p>
                               </div>
                             );
                           })}
