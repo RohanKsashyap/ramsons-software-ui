@@ -322,19 +322,15 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
 
       if (invoice?._id) {
         await updateTransaction(invoice._id, invoiceData);
-      } else {
-        await createTransaction(invoiceData);
-      }
-
-      // Step 3: Deduct from Advance if used
-      if (useAdvance && selectedCustomer?.advancePayment) {
-        const advanceToUse = Math.min(total, selectedCustomer.advancePayment);
-        try {
-          await apiService.customers.useAdvancePayment(customerId, advanceToUse);
-        } catch (err) {
-          console.error('Failed to deduct advance:', err);
-          // We continue anyway since the invoice is already saved as 'paid'
+        if (useAdvance) {
+          try {
+            await apiService.transactions.applyAdvanceDeduction(invoice._id, total);
+          } catch (err) {
+            console.error('Failed to deduct advance during update:', err);
+          }
         }
+      } else {
+        await createTransaction({ ...invoiceData, useAdvance: true } as any);
       }
 
       if (onSave) await onSave();
@@ -400,24 +396,24 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
           </div>
         </header> */}
 
-        <header className="bg-white border-b border-gray-200 px-8 py-4 sticky top-0 z-40">
+        <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 sticky top-0 z-40">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               <button 
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-1.5 md:p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X className="h-6 w-6 text-gray-500" />
+                <X className="h-5 w-5 md:h-6 md:w-6 text-gray-500" />
               </button>
-              <h1 className="text-xl font-bold text-gray-900">
+              <h1 className="text-sm md:text-xl font-bold text-gray-900 truncate max-w-[150px] md:max-w-none">
                 {invoice ? 'Edit Invoice' : 'New Invoice'} #INV-{invoice?._id?.substring(0, 8) || 'Draft'}
               </h1>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-6 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all disabled:opacity-50"
+                className="px-4 md:px-6 py-1.5 md:py-2 rounded-xl bg-blue-600 text-white text-xs md:text-sm font-bold hover:bg-blue-700 transition-all disabled:opacity-50"
               >
                 {loading ? 'Saving...' : 'Save Invoice'}
               </button>
@@ -425,16 +421,16 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-8 mt-8">
+        <main className="max-w-7xl mx-auto px-4 md:px-8 mt-4 md:mt-8">
           {/* Breadcrumbs & Title */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4">
             <div>
-              <div className="flex items-center gap-2 text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              <div className="flex items-center gap-2 text-[10px] md:text-xs font-medium text-gray-400 uppercase tracking-wider mb-1 md:mb-2">
                 <span>Invoices</span>
                 <span className="text-gray-300">/</span>
                 <span className="text-gray-900">Create New</span>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                 Invoice #INV-{invoice?._id?.substring(0, 8) || '2024-082'}
               </h1>
               <div className="flex items-center gap-3 mt-1">
@@ -444,60 +440,60 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                 <span className="text-xs text-gray-400">Last saved 3 mins ago</span>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3 overflow-x-auto pb-2 md:pb-0">
               <button 
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                className="whitespace-nowrap px-4 md:px-6 py-2 md:py-2.5 rounded-xl border border-gray-200 bg-white text-xs md:text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
               >
                 Preview PDF
               </button>
               <button 
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-6 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="whitespace-nowrap px-4 md:px-6 py-2 md:py-2.5 rounded-xl bg-blue-600 text-white text-xs md:text-sm font-bold hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
-                {loading ? 'Saving...' : (invoice ? 'Update Invoice' : 'Save Invoice')}
+                {loading ? 'Saving...' : (invoice ? 'Update' : 'Save')}
               </button>
               <button 
                 onClick={onClose}
-                className="p-2.5 rounded-xl border border-gray-200 bg-white text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-2 md:p-2.5 rounded-xl border border-gray-200 bg-white text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4 md:h-5 md:w-5" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-12 gap-8">
+          <div className="grid grid-cols-12 gap-4 md:gap-8">
             {/* Left Column - Main Form */}
-            <div className="col-span-12 lg:col-span-8 space-y-8">
-              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-10">
+            <div className="col-span-12 lg:col-span-8 space-y-4 md:space-y-8">
+              <div className="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 p-4 md:p-10">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-12">
-                  <div className="space-y-4">
-                    <div className="h-16 w-16 bg-gray-900 rounded-2xl flex items-center justify-center">
+                <div className="flex flex-col md:flex-row justify-between items-start mb-8 md:mb-12 gap-6">
+                  <div className="space-y-4 w-full md:w-auto">
+                    <div className="h-12 w-12 md:h-16 md:w-16 bg-gray-900 rounded-xl md:rounded-2xl flex items-center justify-center">
                       {logoUrl ? (
-                        <img src={logoUrl} alt="Logo" className="h-10 w-10 object-contain brightness-0 invert" />
+                        <img src={logoUrl} alt="Logo" className="h-8 w-8 md:h-10 md:w-10 object-contain brightness-0 invert" />
                       ) : (
-                        <FileText className="h-8 w-8 text-white" />
+                        <FileText className="h-6 w-6 md:h-8 md:w-8 text-white" />
                       )}
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">{companyDetails.name || 'Skyline Digital Agency'}</h2>
-                      <p className="text-sm text-gray-500 max-w-xs">{companyDetails.address || '123 Tech Plaza, Silicon Valley, CA'}</p>
-                      <p className="text-sm text-gray-500">{companyDetails.email || 'billing@skylinedigital.com'}</p>
+                      <h2 className="text-lg md:text-xl font-bold text-gray-900">{companyDetails.name || 'Skyline Digital Agency'}</h2>
+                      <p className="text-xs md:text-sm text-gray-500 max-w-xs">{companyDetails.address || '123 Tech Plaza, Silicon Valley, CA'}</p>
+                      <p className="text-xs md:text-sm text-gray-500">{companyDetails.email || 'billing@skylinedigital.com'}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <h2 className="text-5xl font-black text-gray-100 uppercase tracking-tighter">Invoice</h2>
-                    <div className="mt-6">
+                  <div className="text-left md:text-right w-full md:w-auto border-t md:border-t-0 pt-6 md:pt-0">
+                    <h2 className="text-4xl md:text-5xl font-black text-gray-100 uppercase tracking-tighter">Invoice</h2>
+                    <div className="mt-4 md:mt-6">
                       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Issue Date</p>
                       <div className="relative">
                         <input
                           type="date"
                           value={invoiceDate}
                           onChange={(e) => setInvoiceDate(e.target.value)}
-                          className="text-right font-bold text-gray-900 focus:outline-none appearance-none bg-transparent"
+                          className="text-left md:text-right font-bold text-gray-900 focus:outline-none appearance-none bg-transparent w-full md:w-auto"
                         />
                       </div>
                     </div>
@@ -505,7 +501,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                 </div>
 
                 {/* Bill To Section */}
-                <div className="grid grid-cols-2 gap-8 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Bill To</h3>
@@ -514,7 +510,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                         onClick={() => setShowCustomerForm(true)}
                         className="text-blue-600 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1"
                       >
-                        <Plus className="h-3 w-3" /> Add New Customer
+                        <Plus className="h-3 w-3" /> Add New
                       </button>
                     </div>
                     
@@ -527,7 +523,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                         />
                       </div>
                       
-                      <div className="bg-blue-50 bg-opacity-30 rounded-2xl p-6 border border-blue-100 border-dashed">
+                      <div className="bg-blue-50 bg-opacity-30 rounded-2xl p-4 md:p-6 border border-blue-100 border-dashed">
                         {selectedCustomer ? (
                           <div className="space-y-2">
                             <p className="text-sm font-bold text-gray-900">{selectedCustomer.name}</p>
@@ -535,7 +531,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                             <p className="text-xs text-gray-500">{selectedCustomer.email}</p>
                             
                             {selectedCustomer.advancePayment && selectedCustomer.advancePayment > 0 ? (
-                              <div className="mt-4 p-4 bg-green-50 rounded-2xl border border-green-100 shadow-sm">
+                              <div className="mt-4 p-3 md:p-4 bg-green-50 rounded-2xl border border-green-100 shadow-sm">
                                 <div className="flex items-center justify-between mb-2">
                                   <div className="flex items-center gap-2">
                                     <div className="p-1.5 bg-green-100 rounded-lg">
@@ -545,7 +541,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                                   </div>
                                   <span className="text-sm font-black text-green-700">₹{selectedCustomer.advancePayment.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                   <button
                                     type="button"
                                     onClick={() => setUseAdvance(!useAdvance)}
@@ -602,8 +598,8 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                               <Search className="h-5 w-5" />
                             </div>
                             <div>
-                              <p className="text-xs font-bold text-gray-500">Customer details will appear here</p>
-                              <p className="text-[10px] text-gray-400">Select a client from the dropdown or add a custom entry</p>
+                              <p className="text-xs font-bold text-gray-500">Customer details</p>
+                              <p className="text-[10px] text-gray-400">Select a client from the dropdown</p>
                             </div>
                           </div>
                         )}
@@ -612,12 +608,12 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                   </div>
 
                   <div className="space-y-4">
-                    <div className="pt-6"></div> {/* Spacer */}
+                    <div className="hidden md:block pt-6"></div> {/* Spacer */}
                     <textarea
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
                       placeholder="Billing Address (Optional)"
-                      className="w-full rounded-2xl border border-gray-100 bg-gray-50 px-5 py-4 text-sm placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all min-h-[60px]"
+                      className="w-full rounded-2xl border border-gray-100 bg-gray-50 px-5 py-4 text-sm placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all min-h-[80px] md:min-h-[60px]"
                     />
                     <input
                       type="text"
@@ -630,8 +626,8 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                 </div>
 
                 {/* Product/Service Table */}
-                <div className="mb-10">
-                  <table className="w-full">
+                <div className="mb-10 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                  <table className="w-full min-w-[600px]">
                     <thead>
                       <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                         <th className="text-left pb-4">Product / Service</th>
@@ -724,39 +720,39 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                   </table>
                 </div>
 
-                <div className="flex items-center gap-4 mb-12">
+                <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-8 md:mb-12">
                   <button 
                     onClick={() => setShowProductSelector(true)}
-                    className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest hover:bg-blue-100 transition-colors flex items-center gap-2"
+                    className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
                   >
-                    <Plus className="h-3 w-3" /> Add Product from Catalog
+                    <Plus className="h-3 w-3" /> Catalog
                   </button>
                   <button 
                     onClick={() => setShowProductForm(true)}
-                    className="px-4 py-2 rounded-xl bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-widest hover:bg-green-100 transition-colors flex items-center gap-2"
+                    className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-widest hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
                   >
-                    <Plus className="h-3 w-3" /> Add Product
+                    <Plus className="h-3 w-3" /> Product
                   </button>
                   <button 
                     onClick={() => setShowBundleForm(true)}
-                    className="px-4 py-2 rounded-xl bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-widest hover:bg-purple-100 transition-colors flex items-center gap-2"
+                    className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-widest hover:bg-purple-100 transition-colors flex items-center justify-center gap-2"
                   >
-                    <Plus className="h-3 w-3" /> Add Bundle
+                    <Plus className="h-3 w-3" /> Bundle
                   </button>
                 </div>
 
                 {/* Bottom Summary */}
-                <div className="grid grid-cols-12 gap-12 pt-10 border-t border-gray-50">
-                  <div className="col-span-7">
+                <div className="flex flex-col md:flex-row gap-8 md:gap-12 pt-8 md:pt-10 border-t border-gray-50">
+                  <div className="w-full md:w-7/12">
                     <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Payment Notes</h3>
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Add instructions or terms here..."
-                      className="w-full h-32 rounded-3xl border border-gray-100 bg-gray-50 p-6 text-sm placeholder:text-gray-300 focus:outline-none transition-all"
+                      className="w-full h-32 rounded-2xl md:rounded-3xl border border-gray-100 bg-gray-50 p-4 md:p-6 text-sm placeholder:text-gray-300 focus:outline-none transition-all"
                     />
                   </div>
-                  <div className="col-span-5">
+                  <div className="w-full md:w-5/12">
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-400">Subtotal</span>
@@ -769,7 +765,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                       </div>
                       <div className="pt-4 border-t border-gray-100 flex justify-between items-end">
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Amount</span>
-                        <span className="text-3xl font-black text-blue-600">
+                        <span className="text-2xl md:text-3xl font-black text-blue-600">
                         ₹{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </span>
                       </div>
@@ -780,15 +776,15 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
             </div>
 
             {/* Right Column - Sidebar */}
-            <div className="col-span-12 lg:col-span-4 space-y-8">
+            <div className="col-span-12 lg:col-span-4 space-y-4 md:space-y-8">
               {/* Invoice Settings */}
-              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="bg-blue-600 px-6 py-4 flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-white" />
                   <h3 className="text-sm font-bold text-white">Invoice Settings</h3>
                 </div>
                
-              <div className="p-8 space-y-8">
+              <div className="p-6 md:p-8 space-y-6 md:space-y-8">
 
                    {/*
                   <div className="space-y-4">
@@ -849,7 +845,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
               </div>
 
               {/* Internal Notes */}
-              <div className="bg-blue-50 bg-opacity-30 rounded-3xl shadow-sm border border-blue-100 p-8">
+              <div className="bg-blue-50 bg-opacity-30 rounded-2xl md:rounded-3xl shadow-sm border border-blue-100 p-6 md:p-8">
                 <div className="flex items-center gap-2 mb-4">
                   <Bell className="h-4 w-4 text-blue-600" />
                   <h3 className="text-sm font-bold text-blue-600 uppercase tracking-widest">Internal Notes</h3>
@@ -857,7 +853,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                 <p className="text-xs text-blue-400 leading-relaxed mb-6">These notes are for your team only and will not appear on the client's PDF invoice.</p>
                 <textarea
                   placeholder="Reminder: Follow up on Tuesday if not paid..."
-                  className="w-full h-32 rounded-2xl border border-blue-100 bg-white p-6 text-sm placeholder:text-gray-300 focus:outline-none"
+                  className="w-full h-32 rounded-2xl border border-blue-100 bg-white p-4 md:p-6 text-sm placeholder:text-gray-300 focus:outline-none"
                 />
               </div>
 
@@ -867,10 +863,10 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
                 <button 
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="w-full md:w-auto px-12 py-4 rounded-2xl bg-blue-600 text-white text-lg font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-3 disabled:opacity-50"
+                  className="w-full md:w-auto px-8 md:px-12 py-3 md:py-4 rounded-xl md:rounded-2xl bg-blue-600 text-white text-base md:text-lg font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-3 disabled:opacity-50"
                 >
-                  <CheckCircle2 className="h-6 w-6" />
-                  {loading ? 'Saving Invoice...' : (invoice ? 'Update Invoice' : 'Save Invoice')}
+                  <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6" />
+                  {loading ? 'Saving...' : (invoice ? 'Update' : 'Save')}
                 </button>
               </div>
             </div>
@@ -878,17 +874,17 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
         </main>
         
         {/* Footer */}
-        <footer className="max-w-7xl mx-auto px-8 mt-16 pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-          <div className="flex items-center gap-2 mb-4 md:mb-0">
+        <footer className="max-w-7xl mx-auto px-4 md:px-8 mt-12 md:mt-16 pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest gap-4 md:gap-0">
+          <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-gray-300" />
             <span>Secure Billing Protocol v2.4</span>
           </div>
-          <div className="flex gap-8 mb-4 md:mb-0 text-gray-500">
-            <a href="#" className="hover:text-gray-900">Documentation</a>
-            <a href="#" className="hover:text-gray-900">Keyboard Shortcuts</a>
-            <a href="#" className="hover:text-gray-900">API Reference</a>
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-gray-500">
+            <a href="#" className="hover:text-gray-900">Docs</a>
+            <a href="#" className="hover:text-gray-900">Shortcuts</a>
+            <a href="#" className="hover:text-gray-900">API</a>
           </div>
-          <div>
+          <div className="text-center md:text-right">
             © 2024 Skyline Digital. All rights reserved.
           </div>
         </footer>

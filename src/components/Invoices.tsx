@@ -177,7 +177,7 @@ export const Invoices: React.FC = () => {
             className="flex items-center justify-center gap-2 bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm whitespace-nowrap"
           >
             <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">New Invoice</span>
+            <span className="hidden sm:inline"> </span>
             <span className="sm:hidden">New</span>
           </button>
         </div>
