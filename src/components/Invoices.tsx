@@ -82,6 +82,9 @@ export const Invoices: React.FC = () => {
   });
 
   const getStatusBadgeClass = (status:string ,paymentMethod?:string) => {
+    if (paymentMethod === 'advance') {
+      return 'bg-blue-100 text-blue-800';
+    }
     switch(status) {
       case 'completed':
       case 'paid':
@@ -104,15 +107,16 @@ export const Invoices: React.FC = () => {
 
 
   const getStatusLabel = (invoice: Transaction) => {
+    if (invoice.paymentMethod === 'advance') {
+      return 'Paid by advance';
+    }
+    
     // Show partial payment badge if paidAmount exists and is less than amount
     const paidAmount = (invoice as any).paidAmount || 0;
     if (paidAmount > 0 && paidAmount < invoice.amount) {
       return `₹${paidAmount.toFixed(2)} paid of ₹${invoice.amount.toFixed(2)}`;
     }
-    // Show "Paid by advance" for fully advance-paid transactions
-    if (invoice.paymentMethod === 'advance' && paidAmount >= invoice.amount) {
-      return 'Paid by advance';
-    }
+    
     return invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1);
   };
   

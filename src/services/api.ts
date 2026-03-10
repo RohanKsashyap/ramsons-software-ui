@@ -14,8 +14,8 @@ interface Customer {
   advancePayment?: number;
 }
 
-// const API_BASE_URL = 'https://ramsons-software-backend.onrender.com/api/v1';
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+const API_BASE_URL = 'https://ramsons-software-backend.onrender.com/api/v1';
+// const API_BASE_URL = 'http://localhost:5000/api/v1';
 
 class ApiService {
   private token: string | null = null;
@@ -169,6 +169,10 @@ class ApiService {
     }),
     getDueDateAlerts: () => this.request<any>('/transactions/due-date-alerts'),
     getDueSoon: (days: number = 7) => this.request<any>(`/transactions/due-soon?days=${days}`),
+    applyAdvanceDeduction: (transactionId: string, amount: number) => this.request<any>(`/transactions/advance-deduction`, {
+      method: 'POST',
+      body: JSON.stringify({ transactionId, amount }),
+    }),
   };
 
   // Report API

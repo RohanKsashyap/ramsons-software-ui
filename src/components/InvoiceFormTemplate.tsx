@@ -330,7 +330,7 @@ export const InvoiceFormTemplate: React.FC<InvoiceFormTemplateProps> = ({
           }
         }
       } else {
-        await createTransaction({ ...invoiceData, useAdvance: true } as any);
+        await createTransaction({ ...invoiceData, useAdvance } as any);
       }
 
       if (onSave) await onSave();

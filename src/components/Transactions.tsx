@@ -130,6 +130,9 @@ export const Transactions: React.FC = () => {
   });
 
   const getStatusBadgeClass = (status: string, paymentMethod?: string) => {
+    if (paymentMethod === 'advance') {
+      return 'bg-blue-100 text-blue-800';
+    }
     switch(status) {
       case 'completed':
       case 'paid':
@@ -293,7 +296,7 @@ export const Transactions: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">₹{transaction.amount.toFixed(2)}</div>
-                      {transaction.type === 'invoice' && transaction.status !== 'completed' && (
+                      {transaction.type === 'invoice' && transaction.status !== 'completed' && transaction.paymentMethod !== 'advance' && (
                         <div className="text-xs text-gray-500">
                           Status: {transaction.status}
                         </div>
