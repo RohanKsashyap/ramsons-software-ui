@@ -270,7 +270,7 @@ export const Dashboard: React.FC = () => {
                 <IndianRupee className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0" />
               </div>
               <div>
-                <span className="font-bold text-green-900 text-sm md:text-base block">New Invoice mmmmmm</span>
+                <span className="font-bold text-green-900 text-sm md:text-base block">New Invoice </span>
                 <span className="text-[10px] md:text-xs text-green-600/70">Add a new invoice</span>
               </div>
             </button>
