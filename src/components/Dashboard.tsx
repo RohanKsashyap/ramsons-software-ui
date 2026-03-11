@@ -264,14 +264,14 @@ export const Dashboard: React.FC = () => {
               </div>
             </button>
             <button 
-              onClick={() => window.location.hash = '#/transactions?action=new'}
+              onClick={() => window.location.hash = '#/invoices?action=new'}
               className="w-full flex items-center gap-3 p-3 md:p-4 text-left bg-green-50 hover:bg-green-100 rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] border border-green-100">
               <div className="bg-green-600 p-2 rounded-lg text-white shadow-md shadow-green-200">
                 <IndianRupee className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0" />
               </div>
               <div>
-                <span className="font-bold text-green-900 text-sm md:text-base block">Record Sale</span>
-                <span className="text-[10px] md:text-xs text-green-600/70">Add a new transaction</span>
+                <span className="font-bold text-green-900 text-sm md:text-base block">New Invoice</span>
+                <span className="text-[10px] md:text-xs text-green-600/70">Add a new invoice</span>
               </div>
             </button>
             <button 

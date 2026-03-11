@@ -208,14 +208,14 @@ export const Transactions: React.FC = () => {
             </button>
           )}
           
-          <button 
+          {/* <button 
             onClick={() => setShowForm(true)}
             className="flex items-center justify-center gap-1 md:gap-2 bg-blue-600 text-white px-2 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs md:text-sm whitespace-nowrap"
           >
             <Plus className="h-3 md:h-4 w-3 md:w-4" />
             <span className="hidden sm:inline">New Transaction</span>
-            <span className="sm:hidden">New</span>
-          </button>
+            <span className="sm:hidden">New</span> */}
+          {/* </button> */}
         </div>
       </div>
 

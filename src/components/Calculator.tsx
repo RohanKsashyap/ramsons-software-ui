@@ -206,7 +206,7 @@ export const Calculator: React.FC = () => {
       </div>
       
       {/* Financial Calculators */}
-      <div className="bg-white rounded-lg shadow p-6">
+      {/* <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-medium text-gray-800 mb-4">Financial Tools</h3>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -225,7 +225,7 @@ export const Calculator: React.FC = () => {
             <p className="text-sm text-gray-600">Estimate taxes on sales and income</p>
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
