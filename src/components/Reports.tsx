@@ -217,7 +217,16 @@ export const Reports: React.FC = () => {
         const recentTransactions = transactions.slice(0, 5);
         recentTransactions.forEach((t: any) => {
           const date = new Date(t.createdAt).toLocaleDateString();
-          reportText += `- ${date}: ${t.type} (₹${(t.amount || 0).toLocaleString()}) - ${t.status}\n`;
+          let details = '';
+          if (t.items && t.items.length > 0) {
+            details = t.items.map((item: any) => {
+              const product = item.product || item.productId;
+              const productName = typeof product === 'object' ? product.name : 'Product';
+              const unit = typeof product === 'object' ? product.unit : '';
+              return `${productName} (${item.quantity}${unit ? ' ' + unit : ''})`;
+            }).join(', ');
+          }
+          reportText += `- ${date}: ${t.type}${details ? ' [' + details + ']' : ''} (₹${(t.amount || 0).toLocaleString()}) - ${t.status}\n`;
         });
         if (transactions.length > 5) {
           reportText += `... and ${transactions.length - 5} more transactions.\n`;

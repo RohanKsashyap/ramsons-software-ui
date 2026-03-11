@@ -159,7 +159,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onClose, onSa
                 price: item.pricePerUnit,
                 description: item.product?.description || '',
                 layout: item.product?.layout || '',
-                unit: item.product?.unit || 'pcs',
+                unit: item.product?.unit || '',
                 inStock: true,
                 quantity: totalQtyForThisProduct // Set initial quantity to match total invoice quantity
               });
@@ -569,7 +569,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onClose, onSa
                                     className="w-full px-2 py-1 border border-gray-300 rounded-md text-right"
                                   />
                                   <select
-                                    value={editingItem?.product?.unit || (typeof editingItem?.productId === 'object' ? (editingItem!.productId as any).unit : '') || 'pcs'}
+                                    value={editingItem?.product?.unit || (typeof editingItem?.productId === 'object' ? (editingItem!.productId as any).unit : '') || ''}
                                     onChange={(e) => setEditingItem({
                                       ...editingItem!,
                                       product: {
@@ -579,7 +579,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onClose, onSa
                                     })}
                                     className="w-full px-1 py-1 border border-gray-300 rounded-md text-[10px]"
                                   >
-                                    <option value="pcs">pcs</option>
+                                    <option value="">No unit</option>
                                     <option value="kg">kg</option>
                                     <option value="g">g</option>
                                     <option value="mtr">mtr</option>
@@ -646,7 +646,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoice, onClose, onSa
                                     -
                                   </button>
                                   <span className="px-3 py-0.5 border-t border-b border-gray-300 bg-white">
-                                    {item.quantity} {item.product?.unit || (typeof item.productId === 'object' ? (item.productId as any).unit : '') || 'pcs'}
+                                    {item.quantity} {item.product?.unit || (typeof item.productId === 'object' ? (item.productId as any).unit : '')}
                                   </span>
                                   <button 
                                     type="button"

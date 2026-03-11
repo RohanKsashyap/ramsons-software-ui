@@ -297,7 +297,7 @@ export const CustomerOrdersModal: React.FC<CustomerOrdersModalProps> = ({
                                             <div>
                                               <p className="font-bold text-gray-900">{productName}</p>
                                               <div className="flex flex-col gap-0.5 mt-1">
-                                                <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
+                                                <p className="text-xs text-gray-400">Qty: {item.quantity} {product?.unit || ''}</p>
                                                 {product?.description && (
                                                   <p className="text-[10px] text-gray-500 italic leading-tight max-w-[250px]">
                                                     {product.description}

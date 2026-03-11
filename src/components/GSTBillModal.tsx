@@ -96,15 +96,37 @@ export const GSTBillModal: React.FC<GSTBillModalProps> = ({ invoice: initialInvo
   // Helper to get enriched product name
   const getProductName = (item: any) => {
     if (item.product?.name) return item.product.name;
-    const foundProduct = products.find(p => (p.id || p._id) === item.productId);
+    if (typeof item.productId === 'object' && item.productId?.name) return item.productId.name;
+    const prodId = typeof item.productId === 'object' ? item.productId._id : item.productId;
+    const foundProduct = products.find(p => (p.id || p._id) === prodId);
     return foundProduct?.name || 'Product';
   };
 
   // Helper to get enriched product SKU
   const getProductSKU = (item: any, idx: number) => {
     if (item.product?.sku) return item.product.sku;
-    const foundProduct = products.find(p => (p.id || p._id) === item.productId);
+    if (typeof item.productId === 'object' && item.productId?.sku) return item.productId.sku;
+    const prodId = typeof item.productId === 'object' ? item.productId._id : item.productId;
+    const foundProduct = products.find(p => (p.id || p._id) === prodId);
     return foundProduct?.sku || `ITEM-${idx + 1}`;
+  };
+
+  // Helper to get enriched product description
+  const getProductDescription = (item: any) => {
+    if (item.product?.description) return item.product.description;
+    if (typeof item.productId === 'object' && item.productId?.description) return item.productId.description;
+    const prodId = typeof item.productId === 'object' ? item.productId._id : item.productId;
+    const foundProduct = products.find(p => (p.id || p._id) === prodId);
+    return foundProduct?.description || '';
+  };
+
+  // Helper to get enriched product unit
+  const getProductUnit = (item: any) => {
+    if (item.product?.unit) return item.product.unit;
+    if (typeof item.productId === 'object' && item.productId?.unit) return item.productId.unit;
+    const prodId = typeof item.productId === 'object' ? item.productId._id : item.productId;
+    const foundProduct = products.find(p => (p.id || p._id) === prodId);
+    return foundProduct?.unit || '';
   };
 
   const getCustomerName = (): string => {
@@ -351,10 +373,10 @@ export const GSTBillModal: React.FC<GSTBillModalProps> = ({ invoice: initialInvo
                         </td>
                         <td className="py-6">
                           <p className="text-sm font-bold text-gray-800 mb-1">{getProductName(item)}</p>
-                          <p className="text-xs text-gray-400">{item.product?.description || products.find(p => (p.id || p._id) === item.productId)?.description}</p>
+                          <p className="text-xs text-gray-400">{getProductDescription(item)}</p>
                         </td>
                         <td className="py-6 text-center text-sm font-semibold text-gray-600">
-                          {item.quantity}
+                          {item.quantity} {getProductUnit(item)}
                         </td>
                         <td className="py-6 text-right text-sm font-semibold text-gray-600">
                           ₹{item.pricePerUnit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}

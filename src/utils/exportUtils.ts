@@ -53,7 +53,8 @@ export const exportToExcel = async (reportType: string, data: ReportData, filena
         const itemDetails = t.items.map((item: any) => {
           const product = item.product || item.productId;
           const productName = typeof product === 'object' ? product.name : 'Product';
-          return `${productName} (${item.quantity} x ₹${item.pricePerUnit || 0})`;
+          const unit = typeof product === 'object' ? product.unit : '';
+          return `${productName} (${item.quantity}${unit ? ' ' + unit : ''} x ₹${item.pricePerUnit || 0})`;
         }).join(', ');
         details = itemDetails + (t.description ? ` - ${t.description}` : '');
       } else if (t.paymentMethod === 'advance' && t.advanceOriginalAmount) {
@@ -220,7 +221,8 @@ export const exportToPDF = async (reportType: string, data: ReportData, filename
                           ${t.items.map((item: any) => {
                             const product = item.product || item.productId;
                             const productName = typeof product === 'object' ? product.name : 'Product';
-                            return `<div style="margin-bottom: 2px;">• ${productName} <span style="color: #64748b;">(${item.quantity} x ₹${(item.pricePerUnit || 0).toLocaleString()})</span></div>`;
+                            const unit = typeof product === 'object' ? product.unit : '';
+                            return `<div style="margin-bottom: 2px;">• ${productName} <span style="color: #64748b;">(${item.quantity}${unit ? ' ' + unit : ''} x ₹${(item.pricePerUnit || 0).toLocaleString()})</span></div>`;
                           }).join('')}
                         </div>
                         ${t.description ? `<div style="font-size: 10px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 2px; margin-top: 2px;">${t.description}</div>` : ''}
