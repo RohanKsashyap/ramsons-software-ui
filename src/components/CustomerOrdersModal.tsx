@@ -237,7 +237,7 @@ export const CustomerOrdersModal: React.FC<CustomerOrdersModalProps> = ({
                           <td className="p-5">
                             <div className="flex flex-col">
                               <p className="font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
-                                {t.type.charAt(0).toUpperCase() + t.type.slice(1)} #{t.reference || t._id.slice(-6).toUpperCase()}
+                                {t.type.charAt(0).toUpperCase() + t.type.slice(1)} #{t.reference || t._id.slice().toUpperCase()}
                               </p>
                               <p className="text-xs text-gray-400 mt-1">{t.description || 'No description provided'}</p>
                               {(t.type === 'invoice' || t.items?.length) && (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, X, Calendar, DollarSign, User, Phone } from 'lucide-react';
+import { Search, Filter, X, Calendar, DollarSign, User, Phone, ArrowUpDown } from 'lucide-react';
 import type { Customer } from '../types';
 
 interface SearchFilters {
@@ -198,27 +198,27 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
       {showFilters && (
         <div className="border-t pt-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {/* Balance Range */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 <DollarSign className="h-4 w-4 inline mr-1" />
                 Balance Range
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap lg:flex-nowrap gap-2">
                 <input
                   type="number"
                   placeholder="Min"
                   value={filters.balanceMin}
                   onChange={(e) => handleFilterChange('balanceMin', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 min-w-[80px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <input
                   type="number"
                   placeholder="Max"
                   value={filters.balanceMax}
                   onChange={(e) => handleFilterChange('balanceMax', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 min-w-[80px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -229,18 +229,18 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
                 <Calendar className="h-4 w-4 inline mr-1" />
                 Date Range
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap lg:flex-nowrap gap-2">
                 <input
                   type="date"
                   value={filters.dateFrom}
                   onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <input
                   type="date"
                   value={filters.dateTo}
                   onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -265,12 +265,15 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
             {/* Sort Options */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Sort By</label>
+              <label className="block text-sm font-medium text-gray-700">
+                <ArrowUpDown className="h-4 w-4 inline mr-1" />
+                Sort By
+              </label>
               <div className="flex gap-2">
                 <select
                   value={filters.sortBy}
                   onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="name">Name</option>
                   <option value="balance">Balance</option>

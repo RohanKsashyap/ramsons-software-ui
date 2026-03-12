@@ -262,7 +262,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onClose, onSa
               )}
 
               <div className="rounded-lg border border-gray-200 bg-white/80 p-5 shadow-sm">
-                <label className="block text-sm font-semibold text-gray-800 mb-3">
+                <label className="block text-sm font-semibold text-red-600 mb-3">
                   Pending Invoices
                 </label>
                 
@@ -283,7 +283,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onClose, onSa
                         />
                         <div className="ml-3 flex-1">
                           <div className="flex justify-between">
-                            <p className="text-sm font-medium text-gray-900">INV-{invoice._id?.substring(0, 8) || 'N/A'}</p>
+                            <p className="text-sm font-medium text-gray-900">INV-{invoice._id?.substring(0) || 'N/A'}</p>
                             <p className="text-sm font-semibold text-gray-900">₹{invoice.amount.toFixed(2)}</p>
                           </div>
                           <p className="text-xs text-gray-500">Due: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</p>
