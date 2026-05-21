@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
-const PROD_URL = 'https://ramsons-accounting.web.app'; // Replace with your actual deployed URL
+const PROD_URL = 'https://ramsons-accounting-software.vercel.app'; // Replace with your actual deployed URL
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -17,7 +17,7 @@ function createWindow() {
   });
 
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
+    mainWindow.loadURL('https://ramsons-accounting-software.vercel.app');
     mainWindow.webContents.openDevTools();
   } else {
     // In production, load the deployed URL
