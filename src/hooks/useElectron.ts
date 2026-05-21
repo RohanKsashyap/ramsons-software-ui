@@ -12,13 +12,13 @@ export const useCustomers = () => {
       setLoading(true);
       const response = await apiService.customers.getAll();
       // Handle the API response structure which has data in a nested 'data' property
-      const customersData = response.data || [];
-      // Convert MongoDB _id to id for consistency and filter out null/invalid customers
+      const customersData = response.data || response || [];
+      // Handle both MongoDB _id and SQL id for consistency
       const customersWithId = customersData
-        .filter((customer: any) => customer && customer._id)
+        .filter((customer: any) => customer && (customer._id || customer.id))
         .map((customer: any) => ({
           ...customer,
-          id: customer._id
+          id: customer.id || customer._id
         }));
       setCustomers(customersWithId);
       setError(null);
@@ -67,13 +67,13 @@ export const useCustomers = () => {
       setLoading(true);
       const response = await apiService.customers.search(searchTerm);
       // Handle the API response structure which has data in a nested 'data' property
-      const customersData = response.data || [];
-      // Convert MongoDB _id to id for consistency and filter out null/invalid customers
+      const customersData = response.data || response || [];
+      // Handle both MongoDB _id and SQL id for consistency
       const customersWithId = customersData
-        .filter((customer: any) => customer && customer._id)
+        .filter((customer: any) => customer && (customer._id || customer.id))
         .map((customer: any) => ({
           ...customer,
-          id: customer._id
+          id: customer.id || customer._id
         }));
       setCustomers(customersWithId);
       setError(null);
@@ -111,13 +111,13 @@ export const useTransactions = () => {
       setLoading(true);
       const response = await apiService.transactions.getAll();
       // Handle the API response structure which has data in a nested 'data' property
-      const transactionsData = response.data || [];
-      // Convert MongoDB _id to id for consistency and filter out null/invalid transactions
+      const transactionsData = response.data || response || [];
+      // Handle both MongoDB _id and SQL id for consistency
       const transactionsWithId = transactionsData
-        .filter((transaction: any) => transaction && transaction._id)
+        .filter((transaction: any) => transaction && (transaction._id || transaction.id))
         .map((transaction: any) => ({
           ...transaction,
-          id: transaction._id
+          id: transaction.id || transaction._id
         }));
       setTransactions(transactionsWithId);
       setError(null);

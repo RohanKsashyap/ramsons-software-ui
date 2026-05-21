@@ -2,7 +2,23 @@ const { Sequelize } = require('sequelize');
 const path = require('path');
 
 const isDev = process.env.NODE_ENV === 'development';
-const dbPath = path.join(__dirname, '../database.sqlite');
+let dbPath;
+
+try {
+  const { app } = require('electron');
+  if (app) {
+    // If running in Electron (main or renderer process)
+    const userDataPath = app.getPath('userData');
+    dbPath = path.join(userDataPath, 'database.sqlite');
+  } else {
+    dbPath = path.join(__dirname, '../database.sqlite');
+  }
+} catch (e) {
+  // Not in Electron environment (e.g. running migrations or server standalone)
+  dbPath = path.join(__dirname, '../database.sqlite');
+}
+
+console.log('Using database at:', dbPath);
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',

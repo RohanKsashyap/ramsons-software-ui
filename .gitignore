@@ -24,3 +24,12 @@ dist-ssr
 *.sw?
 .env
 .git_disabled
+node_modules/
+dist/
+dist-electron/
+release/
+win-unpacked/
+*.exe
+*.msi
+.env
+.env.*
