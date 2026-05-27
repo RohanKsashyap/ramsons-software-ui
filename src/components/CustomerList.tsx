@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Edit, Trash2, Plus, Eye, Minus } from 'lucide-react';
+import { Edit, Trash2, Plus, Eye, Minus, BookOpen } from 'lucide-react';
 import { useCustomers } from '../hooks/useElectron';
 import { CustomerForm } from './CustomerForm';
 import { AdvancedSearch } from './AdvancedSearch';
-import CustomerOrdersModal from './CustomerOrdersModal';
+import CustomerLedger from './CustomerLedger';
 import AdvancePaymentModal from './AdvancePaymentModal';
 import apiService from '../services/api';
 import type { Customer } from '../types';
@@ -14,7 +14,7 @@ export const CustomerList: React.FC = () => {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showOrdersModal, setShowOrdersModal] = useState(false);
+  const [showLedgerModal, setShowLedgerModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showAdvanceModal, setShowAdvanceModal] = useState(false);
   const [isAddingAdvance, setIsAddingAdvance] = useState(true);
@@ -88,9 +88,9 @@ export const CustomerList: React.FC = () => {
     setEditingCustomer(null);
   };
 
-  const handleViewOrders = (customer: Customer) => {
+  const handleViewLedger = (customer: Customer) => {
     setSelectedCustomer(customer);
-    setShowOrdersModal(true);
+    setShowLedgerModal(true);
   };
   
   const handleAdvancePayment = (customer: Customer) => {
@@ -213,11 +213,11 @@ export const CustomerList: React.FC = () => {
                 
                 <div className="flex gap-1.5 flex-shrink-0">
                   <button
-                    onClick={() => handleViewOrders(customer)}
+                    onClick={() => handleViewLedger(customer)}
                     className="p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                    title="View Orders"
+                    title="View Ledger"
                   >
-                    <Eye className="h-4 w-4" />
+                    <BookOpen className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleEdit(customer)}
@@ -295,12 +295,12 @@ export const CustomerList: React.FC = () => {
         />
       )}
 
-      {/* Customer Orders Modal */}
-      {showOrdersModal && selectedCustomer && (
-        <CustomerOrdersModal
-          customerId={selectedCustomer.id}
+      {/* Customer Ledger Modal */}
+      {showLedgerModal && selectedCustomer && (
+        <CustomerLedger
+          customerId={(selectedCustomer.id || selectedCustomer._id) as string}
           customerName={selectedCustomer.name}
-          onClose={() => setShowOrdersModal(false)}
+          onClose={() => setShowLedgerModal(false)}
         />
       )}
 

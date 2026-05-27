@@ -89,6 +89,7 @@ class ApiService {
         method: 'POST',
         body: JSON.stringify({ amount }),
       }),
+    getDetails: (id: string) => this.request<{ success: boolean; data: any }>(`/customers/${id}/details`),
   };
 
   // Product API

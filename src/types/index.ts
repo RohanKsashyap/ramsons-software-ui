@@ -131,6 +131,8 @@ export interface Transaction {
     totalCredit?: number;
     totalPaid?: number;
   };
+  paidAmount?: number;
+  pendingAmount?: number;
   originalAmount?: number;
   gstRate?: number;
   gstAmount?: number;

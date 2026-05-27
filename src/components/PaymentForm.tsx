@@ -63,7 +63,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onClose, onSa
 
       const pending = allCustomerInvoices.filter((inv: Transaction) => 
         inv.status === 'pending' || inv.status === 'PENDING' || inv.status === 'partial' || inv.status === 'PARTIAL'
-      );
+      ).sort((a, b) => new Date(a.date || a.createdAt).getTime() - new Date(b.date || b.createdAt).getTime());
       
       const paid = allCustomerInvoices.filter((inv: Transaction) => 
         inv.status === 'completed' || inv.status === 'COMPLETED' || inv.status === 'paid' || inv.status === 'PAID'
@@ -147,7 +147,8 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onClose, onSa
       
       const totalAmount = selectedIds.reduce((sum, id) => {
         const invoice = pendingInvoices.find(inv => inv._id === id);
-        return sum + (invoice?.amount || 0);
+        const balance = invoice?.pendingAmount !== undefined ? invoice.pendingAmount : ((invoice?.amount || 0) - (invoice?.paidAmount || 0));
+        return sum + balance;
       }, 0);
 
       return {
@@ -244,16 +245,18 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onClose, onSa
                   </label>
                   <div className="space-y-3 max-h-48 overflow-y-auto">
                     {paidInvoices.map((invoice) => (
-                      <div key={invoice._id} className="flex items-start p-3 border border-green-100 rounded-lg bg-white/50">
+                      <div key={invoice._id} className="flex items-start p-3 border border-green-200 rounded-xl bg-white shadow-sm">
                         <div className="flex-1">
-                          <div className="flex justify-between">
-                            <p className="text-sm font-medium text-gray-900">INV-{invoice._id?.substring(0, 8) || 'N/A'}</p>
-                            <p className="text-sm font-semibold text-green-600">₹{invoice.amount.toFixed(2)}</p>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold text-gray-900">INV-{invoice._id?.substring(0, 8).toUpperCase() || 'N/A'}</p>
+                              <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-700 rounded-full border border-green-200">
+                                Fully Paid
+                              </span>
+                            </div>
+                            <p className="text-sm font-black text-green-600">₹{invoice.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
                           </div>
-                          <div className="flex justify-between items-center mt-1">
-                            <p className="text-xs text-gray-500">Completed</p>
-                            {invoice.description && <p className="text-xs text-gray-500 italic max-w-[70%] truncate">{invoice.description}</p>}
-                          </div>
+                          {invoice.description && <p className="text-[11px] text-gray-500 italic mt-1 truncate">{invoice.description}</p>}
                         </div>
                       </div>
                     ))}
@@ -271,26 +274,90 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ payment, onClose, onSa
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                   </div>
                 ) : pendingInvoices.length > 0 ? (
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {pendingInvoices.map((invoice) => (
-                      <div key={invoice._id} className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleInvoiceSelection(invoice._id)}>
-                        <input
-                          type="checkbox"
-                          checked={formData.selectedInvoiceIds.includes(invoice._id)}
-                          onChange={() => handleInvoiceSelection(invoice._id)}
-                          className="mt-1 h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                        <div className="ml-3 flex-1">
-                          <div className="flex justify-between">
-                            <p className="text-sm font-medium text-gray-900">INV-{invoice._id?.substring(0) || 'N/A'}</p>
-                            <p className="text-sm font-semibold text-gray-900">₹{invoice.amount.toFixed(2)}</p>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {pendingInvoices.map((invoice) => {
+                      const totalAmount = invoice.amount || 0;
+                      const paidAmt = invoice.paidAmount || 0;
+                      const balance = invoice.pendingAmount !== undefined ? invoice.pendingAmount : (totalAmount - paidAmt);
+                      const percentPaid = totalAmount > 0 ? Math.min(100, (paidAmt / totalAmount) * 100) : 0;
+                      const isPartial = paidAmt > 0 && balance > 0;
+                      
+                      return (
+                        <div key={invoice._id} 
+                          className={`flex items-start p-4 border rounded-xl transition-all duration-200 cursor-pointer shadow-sm
+                            ${formData.selectedInvoiceIds.includes(invoice._id) 
+                              ? 'border-blue-500 bg-blue-50/30 ring-1 ring-blue-500/20' 
+                              : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'}`}
+                          onClick={() => handleInvoiceSelection(invoice._id)}>
+                          
+                          <div className="flex items-center h-full pt-1">
+                            <input
+                              type="checkbox"
+                              checked={formData.selectedInvoiceIds.includes(invoice._id)}
+                              onChange={() => handleInvoiceSelection(invoice._id)}
+                              className="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500 cursor-pointer"
+                              onClick={(e) => e.stopPropagation()}
+                            />
                           </div>
-                          <p className="text-xs text-gray-500">Due: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</p>
-                          {invoice.description && <p className="text-xs text-gray-600 truncate">{invoice.description}</p>}
+
+                          <div className="ml-4 flex-1 space-y-3">
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-bold text-gray-900">INV-{invoice._id?.substring(0, 8).toUpperCase() || 'N/A'}</p>
+                                  {isPartial ? (
+                                    <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700 rounded-full border border-orange-200">
+                                      Partial
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 rounded-full border border-red-200">
+                                      Unpaid
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-gray-500 font-medium">Due: {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-black text-gray-900">₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                                <p className="text-[10px] text-gray-500 font-bold uppercase">Balance Due</p>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 pt-1">
+                              <div>
+                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Invoice Total</p>
+                                <p className="text-xs font-semibold text-gray-700">₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Paid So Far</p>
+                                <p className="text-xs font-semibold text-green-600">₹{paidAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+                              </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider">
+                                <span className={isPartial ? 'text-orange-600' : 'text-gray-400'}>
+                                  {percentPaid.toFixed(0)}% Paid
+                                </span>
+                                <span className="text-gray-400">₹{totalAmount.toLocaleString('en-IN')} Total</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden border border-gray-200">
+                                <div 
+                                  className={`h-full rounded-full transition-all duration-500 ${isPartial ? 'bg-orange-500' : 'bg-blue-500'}`}
+                                  style={{ width: `${percentPaid}%` }}
+                                ></div>
+                              </div>
+                            </div>
+
+                            {invoice.description && (
+                              <p className="text-[11px] text-gray-500 italic bg-gray-50 p-2 rounded border border-gray-100 line-clamp-1">
+                                {invoice.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">

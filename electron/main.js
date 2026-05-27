@@ -1,7 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+const isDev =  !app.isPackaged;
 const PROD_URL = 'https://ramsons-accounting-software.vercel.app'; // Replace with your actual deployed URL
 
 function createWindow() {
@@ -12,7 +12,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
     },
-    icon: path.join(__dirname, '../public/icon.png'),
+    icon: path.join(__dirname,'icon.png'),
     title: "Ramsons Accounting"
   });
 
