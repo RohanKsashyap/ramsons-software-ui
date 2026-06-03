@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  X, FileText, Calendar, IndianRupee, Clock, Search, 
+  X, FileText,Clock, Search, 
   ChevronDown, ChevronUp, Download, Printer, User,
-  TrendingUp, CheckCircle2, Package, LayoutGrid, CreditCard,
-  ArrowUpRight, ArrowDownLeft, AlertCircle
+  TrendingUp, CheckCircle2, Package,CreditCard,
+  ArrowUpRight,AlertCircle
 } from 'lucide-react';
 import { apiService } from '../services/api';
 
@@ -24,6 +24,7 @@ export const CustomerLedger: React.FC<CustomerLedgerProps> = ({
   const [activeSection, setActiveSection] = useState<'ledger' | 'invoices' | 'payments'>('ledger');
   const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
   const [expandedPayment, setExpandedPayment] = useState<string | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -33,10 +34,20 @@ export const CustomerLedger: React.FC<CustomerLedgerProps> = ({
   const fetchLedgerData = async () => {
     try {
       setLoading(true);
-      const response = await apiService.customers.getDetails(customerId);
-      if (response && response.data) {
-        setData(response.data);
+  
+      const [ledgerResponse, productsResponse] = await Promise.all([
+        apiService.customers.getDetails(customerId),
+        apiService.products.getAll()
+      ]);
+  
+      if (ledgerResponse?.data) {
+        setData(ledgerResponse.data);
       }
+  
+      if (productsResponse?.data) {
+        setProducts(productsResponse.data);
+      }
+  
       setError(null);
     } catch (err) {
       console.error('Error fetching ledger data:', err);
@@ -62,6 +73,16 @@ export const CustomerLedger: React.FC<CustomerLedgerProps> = ({
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
+
+
+  const getProductUnit = (productId: string) => {
+    const product = products.find((p) => p._id === productId);
+    return product?.unit || 'units';
+  };
+
+
+
+
 
   if (loading) {
     return (
@@ -281,7 +302,9 @@ export const CustomerLedger: React.FC<CustomerLedgerProps> = ({
                                     <div key={i} className="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
                                       <div>
                                         <p className="text-sm font-bold text-gray-900">{item.productName}</p>
-                                        <p className="text-[10px] text-gray-500 font-medium">{item.quantity} units × ₹{item.pricePerUnit}</p>
+                                        <p className="text-[10px] text-gray-500 font-medium">
+  {item.quantity} {getProductUnit(item.productId)} × ₹{item.pricePerUnit}
+</p>
                                       </div>
                                       <p className="text-sm font-black text-gray-900">₹{item.total.toLocaleString('en-IN')}</p>
                                     </div>
